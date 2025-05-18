@@ -87,28 +87,26 @@ app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
-
-
 app.post('/rewrite-text', async (req, res) => {
   const { instruction, original = "", frameName = "" } = req.body;
 
   const useEmojis = frameName.toLowerCase().includes("push");
   const emojiLine = useEmojis ? "Add emojis if appropriate (🔥🎯✨🛍️)." : "";
 
-  const prompt = \`
+  const prompt = `
 You are rewriting a short marketing text.
 
-Instruction: \${instruction}
-Original: \${original}
+Instruction: ${instruction}
+Original: ${original}
 
 Rules:
 - Make it short and engaging
 - Do NOT use quotation marks
 - Do NOT mention frame or layout names
-\${emojiLine}
+${emojiLine}
 
 Respond only with the new version of the text.
-\`.trim();
+`.trim();
 
   try {
     const response = await callOpenAI(prompt);
