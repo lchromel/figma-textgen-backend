@@ -2,14 +2,20 @@ import express from 'express';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 import cors from 'cors';
-dotenv.config();
+import fs from 'fs';
+import path from 'path';
 
+dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 const OPENAI_KEY = process.env.OPENAI_KEY;
+
+// Загружаем конфиги
+const limitsJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'limits.json'), 'utf8'));
+const toneJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'tone.json'), 'utf8'));
 
 const callOpenAI = async (prompt) => {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -29,38 +35,46 @@ const callOpenAI = async (prompt) => {
   return content;
 };
 
+// Маршруты для конфигов
+app.get("/limits", (req, res) => {
+  res.json(limitsJson);
+});
+
+app.get("/tone", (req, res) => {
+  res.json(toneJson);
+});
+
 app.post('/generate-text', async (req, res) => {
-  const { topic, language } = req.body;
-  const prompt = `Generate a headline and subheadline for topic "${topic}" in ${language}.
-Return in the format:
+  const { topic, language, frameName } = req.body;
+  const limit = limitsJson[frameName] || {};
+  const tone = toneJson.voice || "Friendly and helpful";
+
+  const prompt = `
+Generate a Headline${limit.subheadline ? " and Subheadline" : ""}${limit.button ? " and Button" : ""} for "${frameName}".
+Topic: "${topic}"
+Language: ${language}
+Tone of voice: ${tone}
+Limit Headline to ${limit.headline || 30} characters.
+${limit.subheadline ? `Limit Subheadline to ${limit.subheadline} characters.` : ''}
+${limit.button ? `Limit Button to ${limit.button} characters.` : ''}
+Respond only with:
 Headline: ...
-Subheadline: ...`;
+${limit.subheadline ? 'Subheadline: ...' : ''}
+${limit.button ? 'Button: ...' : ''}
+`.trim();
 
   try {
     const result = await callOpenAI(prompt);
     const lines = result.split('\n').map(l => l.trim());
     const headline = lines.find(l => l.toLowerCase().startsWith('headline:'))?.split(':').slice(1).join(':').trim();
     const subheadline = lines.find(l => l.toLowerCase().startsWith('subheadline:'))?.split(':').slice(1).join(':').trim();
-    res.json({ headline, subheadline });
+    const button = lines.find(l => l.toLowerCase().startsWith('button:'))?.split(':').slice(1).join(':').trim();
+    res.json({ headline, subheadline, button });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/rewrite-text', async (req, res) => {
-  const { original, instruction } = req.body;
-  const prompt = `Rewrite this text: "${original}". Instruction: ${instruction}`;
-
-  try {
-    const result = await callOpenAI(prompt);
-    res.json({ text: result.trim() });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
-
-app.get('/', (_, res) => {
-  res.send('Figma Textgen backend is running.');
-});
-
-app.listen(PORT, () => console.log(`Server on http://localhost:${PORT}`));

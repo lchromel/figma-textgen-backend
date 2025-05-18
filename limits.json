@@ -1,0 +1,48 @@
+{
+  "Push_01": {
+    "headline": 20,
+    "subheadline": 60
+  },
+  "Push_02": {
+    "headline": 20,
+    "subheadline": 60
+  },
+  "Push_03": {
+    "headline": 20,
+    "subheadline": 60
+  },
+  "Push_04": {
+    "headline": 20,
+    "subheadline": 60
+  },
+  "Push_05": {
+    "headline": 20,
+    "subheadline": 60
+  },
+  "Promo banner_1280x624": {
+    "headline": 20,
+    "subheadline": 40
+  },
+  "ShortCut_640x416": {
+    "headline": 20,
+    "subheadline": 40
+  },
+  "Feed_480x693": {
+    "headline": 20,
+    "subheadline": 40
+  },
+  "Full_screen_1440x2560": {
+    "headline": 30,
+    "subheadline": 120,
+    "button": 15
+  },
+  "Promo_card": {
+    "headline": 30,
+    "subheadline": 120,
+    "button": 15
+  },
+  "Upsell": {
+    "headline": 20,
+    "subheadline": 40
+  }
+}
