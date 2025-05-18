@@ -7,13 +7,19 @@ import path from 'path';
 
 dotenv.config();
 const app = express();
-app.use(cors());
+
+// Явный CORS, разрешающий Figma origin (null)
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 const OPENAI_KEY = process.env.OPENAI_KEY;
 
-// Загружаем конфиги
 const limitsJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'limits.json'), 'utf8'));
 const toneJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'tone.json'), 'utf8'));
 
@@ -35,7 +41,6 @@ const callOpenAI = async (prompt) => {
   return content;
 };
 
-// Маршруты для конфигов
 app.get("/limits", (req, res) => {
   res.json(limitsJson);
 });
