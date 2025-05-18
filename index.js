@@ -87,30 +87,34 @@ app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
+
 app.post('/rewrite-text', async (req, res) => {
   const { instruction, original = "", frameName = "" } = req.body;
+  const useEmojis = (frameName || "").toLowerCase().includes("push");
 
-  const useEmojis = frameName.toLowerCase().includes("push");
-  const emojiLine = useEmojis ? "Add emojis if appropriate (🔥🎯✨🛍️)." : "";
+  const emojiLine = useEmojis ? "Include emojis if they enhance clarity or excitement (e.g., 🔥🎯🚀🛍️)." : "";
 
-  const prompt = `
-You are rewriting a short marketing text.
+  const promptParts = [
+    "You are rewriting a short marketing message based on the provided instruction and original text.",
+    "",
+    "Instruction: " + instruction,
+    "Original: " + original,
+    "",
+    "Guidelines:",
+    "- Do not use quotation marks",
+    "- Do not mention frame or layout names like Push_01",
+    "- Make the tone engaging and readable",
+    "- Keep it short and impactful",
+    emojiLine,
+    "",
+    "Respond only with the new text, with no additional formatting or comments."
+  ];
 
-Instruction: ${instruction}
-Original: ${original}
-
-Rules:
-- Make it short and engaging
-- Do NOT use quotation marks
-- Do NOT mention frame or layout names
-${emojiLine}
-
-Respond only with the new version of the text.
-`.trim();
+  const prompt = promptParts.join("\n");
 
   try {
     const response = await callOpenAI(prompt);
-    const newText = response.trim().replace(/^["']|["']$/g, '');
+    const newText = response.trim().replace(/^['"“”]+|['"“”]+$/g, '');
     res.json({ text: newText });
   } catch (err) {
     res.status(500).json({ error: err.message });
