@@ -1,5 +1,3 @@
 {
-  "style": "friendly, clear, concise",
-  "language": "English",
-  "notes": "Avoid using quotes around headlines. Do not refer to frame names like Push_01. Occasionally include emojis in Push blocks for expressiveness."
+  "voice": "Confident, friendly, clear. Use short sentences. Avoid jargon."
 }

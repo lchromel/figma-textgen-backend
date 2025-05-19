@@ -1,71 +1,122 @@
-import express from "express";
-import cors from "cors";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import express from 'express';
+import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 3000;
-app.use(cors());
+
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
-const limits = JSON.parse(fs.readFileSync(path.join(__dirname, "limits.json"), "utf8"));
-const tone = JSON.parse(fs.readFileSync(path.join(__dirname, "tone.json"), "utf8"));
+const PORT = process.env.PORT || 3000;
+const OPENAI_KEY = process.env.OPENAI_KEY;
 
-app.get("/limits", (req, res) => res.json(limits));
-app.get("/tone", (req, res) => res.json(tone));
+const limitsJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'limits.json'), 'utf8'));
+const toneJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'tone.json'), 'utf8'));
 
-app.post("/generate-text", async (req, res) => {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const { prompt } = req.body;
+const callOpenAI = async (prompt) => {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${OPENAI_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content || '';
+  return content;
+};
+
+app.get("/limits", (req, res) => {
+  res.json(limitsJson);
+});
+
+app.get("/tone", (req, res) => {
+  res.json(toneJson);
+});
+
+app.post('/generate-text', async (req, res) => {
+  const { topic, language, frameName } = req.body;
+  const limit = limitsJson[frameName] || {};
+  const tone = toneJson.voice || "Friendly and helpful";
+
+  const prompt = `
+Generate a Headline${limit.subheadline ? " and Subheadline" : ""}${limit.button ? " and Button" : ""} for "${frameName}".
+Topic: "${topic}"
+Language: ${language}
+Tone of voice: ${tone}
+Limit Headline to ${limit.headline || 30} characters.
+${limit.subheadline ? `Limit Subheadline to ${limit.subheadline} characters.` : ''}
+${limit.button ? `Limit Button to ${limit.button} characters.` : ''}
+Respond only with:
+Headline: ...
+${limit.subheadline ? 'Subheadline: ...' : ''}
+${limit.button ? 'Button: ...' : ''}
+`.trim();
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7
-      })
-    });
-
-    const data = await response.json();
-    const text = data?.choices?.[0]?.message?.content?.trim() || "";
-    res.json({ text });
-  } catch (e) {
-    res.status(500).json({ error: "OpenAI request failed" });
+    const result = await callOpenAI(prompt);
+    const lines = result.split('\n').map(l => l.trim());
+    const headline = lines.find(l => l.toLowerCase().startsWith('headline:'))?.split(':').slice(1).join(':').trim();
+    const subheadline = lines.find(l => l.toLowerCase().startsWith('subheadline:'))?.split(':').slice(1).join(':').trim();
+    const button = lines.find(l => l.toLowerCase().startsWith('button:'))?.split(':').slice(1).join(':').trim();
+    res.json({ headline, subheadline, button });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
-
-app.post('/generate-batch-text', async (req, res) => {
-  const { topic, language, frames } = req.body;
-  const tone = toneJson.voice || "Friendly and helpful";
-
-  let prompt = `You are a helpful creative assistant. Based on the topic "${topic}", language "${language}", and tone "${tone}", generate text blocks for the following frames. Respect character limits. Respond only with clean structured output.` + "\n\n";
-
-  frames.forEach((frame, index) => {
-    prompt += `Frame ${index + 1}: ${frame.name}\n`;
-    prompt += `Headline (max ${frame.limits.headline || 30} chars)\n`;
-    if (frame.limits.subheadline) {
-      prompt += `Subheadline (max ${frame.limits.subheadline} chars)\n`;
-    }
-    if (frame.limits.button) {
-      prompt += `Button (max ${frame.limits.button} chars)\n`;
-    }
-    prompt += "\n";
-  });
-
-  const output = await callOpenAI(prompt);
-  res.send({ result: output });
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
 
 
-app.listen(PORT, () => console.log("Backend running on port " + PORT));
+app.post('/rewrite-text', async (req, res) => {
+  const { instruction, original = "", frameName = "" } = req.body;
+  const useEmojis = (frameName || "").toLowerCase().includes("push");
+
+  const emojiLine = useEmojis ? "Include emojis if they enhance clarity or excitement (e.g., 🔥🎯🚀🛍️)." : "";
+
+  const promptParts = [
+    "You are rewriting a short marketing message based on the provided instruction and original text.",
+    "",
+    "Instruction: " + instruction,
+    "Original: " + original,
+    "",
+    "Guidelines:",
+    "- Do not use quotation marks",
+    "- Do not mention frame or layout names like Push_01",
+    "- Make the tone engaging and readable",
+    "- Keep it short and impactful",
+    emojiLine,
+    "",
+    "Respond only with the new text, with no additional formatting or comments."
+  ];
+
+  const prompt = promptParts.join("\n");
+
+  try {
+    const response = await callOpenAI(prompt);
+    const newText = response.trim().replace(/^['"“”]+|['"“”]+$/g, '');
+    res.json({ text: newText });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
