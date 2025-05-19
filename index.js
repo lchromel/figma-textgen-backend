@@ -57,12 +57,21 @@ app.post('/generate-text', async (req, res) => {
 
   try {
     const result = await callOpenAI(prompt);
-    
+    console.log('OpenAI raw result:', result);
     // Try to parse the response as JSON
     try {
       const jsonResult = JSON.parse(result);
       res.json(jsonResult);
     } catch (parseError) {
+      // Try to extract JSON from the response using regex
+      const match = result.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          const jsonResult = JSON.parse(match[0]);
+          res.json(jsonResult);
+          return;
+        } catch (e) {}
+      }
       // If parsing fails, try to extract the text in the old format
       const lines = result.split('\n').map(l => l.trim());
       const headline = lines.find(l => l.toLowerCase().startsWith('headline:'))?.split(':').slice(1).join(':').trim();
@@ -101,7 +110,7 @@ app.post('/rewrite-text', async (req, res) => {
       res.json(jsonResult);
     } catch (parseError) {
       // If parsing fails, return the text directly
-      const text = result.trim().replace(/^['"“”]+|['"“”]+$/g, '');
+      const text = result.trim().replace(/^['"“""]+|['""""]+$/g, '');
       res.json({ text });
     }
   } catch (err) {
