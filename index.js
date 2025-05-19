@@ -53,31 +53,57 @@ app.get("/tone", (req, res) => {
 });
 
 app.post('/generate-text', async (req, res) => {
-  const { topic, language, frameName } = req.body;
-  const limit = limitsJson[frameName] || {};
-  const tone = toneJson.voice || "Friendly and helpful";
-
-  const prompt = `
-Generate a Headline${limit.subheadline ? " and Subheadline" : ""}${limit.button ? " and Button" : ""} for "${frameName}".
-Topic: "${topic}"
-Language: ${language}
-Tone of voice: ${tone}
-Limit Headline to ${limit.headline || 30} characters.
-${limit.subheadline ? `Limit Subheadline to ${limit.subheadline} characters.` : ''}
-${limit.button ? `Limit Button to ${limit.button} characters.` : ''}
-Respond only with:
-Headline: ...
-${limit.subheadline ? 'Subheadline: ...' : ''}
-${limit.button ? 'Button: ...' : ''}
-`.trim();
+  const { prompt, topic, language } = req.body;
 
   try {
     const result = await callOpenAI(prompt);
-    const lines = result.split('\n').map(l => l.trim());
-    const headline = lines.find(l => l.toLowerCase().startsWith('headline:'))?.split(':').slice(1).join(':').trim();
-    const subheadline = lines.find(l => l.toLowerCase().startsWith('subheadline:'))?.split(':').slice(1).join(':').trim();
-    const button = lines.find(l => l.toLowerCase().startsWith('button:'))?.split(':').slice(1).join(':').trim();
-    res.json({ headline, subheadline, button });
+    
+    // Try to parse the response as JSON
+    try {
+      const jsonResult = JSON.parse(result);
+      res.json(jsonResult);
+    } catch (parseError) {
+      // If parsing fails, try to extract the text in the old format
+      const lines = result.split('\n').map(l => l.trim());
+      const headline = lines.find(l => l.toLowerCase().startsWith('headline:'))?.split(':').slice(1).join(':').trim();
+      const subheadline = lines.find(l => l.toLowerCase().startsWith('subheadline:'))?.split(':').slice(1).join(':').trim();
+      const button = lines.find(l => l.toLowerCase().startsWith('button:'))?.split(':').slice(1).join(':').trim();
+      
+      // If we have a frameName in the request, return in the old format
+      if (req.body.frameName) {
+        res.json({ headline, subheadline, button });
+      } else {
+        // Otherwise, wrap in the new format
+        res.json({
+          frames: [{
+            name: req.body.frameName || "unknown",
+            headline,
+            subheadline,
+            button
+          }]
+        });
+      }
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/rewrite-text', async (req, res) => {
+  const { prompt, topic, language } = req.body;
+
+  try {
+    const result = await callOpenAI(prompt);
+    
+    // Try to parse the response as JSON
+    try {
+      const jsonResult = JSON.parse(result);
+      res.json(jsonResult);
+    } catch (parseError) {
+      // If parsing fails, return the text directly
+      const text = result.trim().replace(/^['"“”]+|['"“”]+$/g, '');
+      res.json({ text });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -85,38 +111,4 @@ ${limit.button ? 'Button: ...' : ''}
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
-});
-
-
-app.post('/rewrite-text', async (req, res) => {
-  const { instruction, original = "", frameName = "" } = req.body;
-  const useEmojis = (frameName || "").toLowerCase().includes("push");
-
-  const emojiLine = useEmojis ? "Include emojis if they enhance clarity or excitement (e.g., 🔥🎯🚀🛍️)." : "";
-
-  const promptParts = [
-    "You are rewriting a short marketing message based on the provided instruction and original text.",
-    "",
-    "Instruction: " + instruction,
-    "Original: " + original,
-    "",
-    "Guidelines:",
-    "- Do not use quotation marks",
-    "- Do not mention frame or layout names like Push_01",
-    "- Make the tone engaging and readable",
-    "- Keep it short and impactful",
-    emojiLine,
-    "",
-    "Respond only with the new text, with no additional formatting or comments."
-  ];
-
-  const prompt = promptParts.join("\n");
-
-  try {
-    const response = await callOpenAI(prompt);
-    const newText = response.trim().replace(/^['"“”]+|['"“”]+$/g, '');
-    res.json({ text: newText });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
 });
