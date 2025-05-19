@@ -44,4 +44,28 @@ app.post("/generate-text", async (req, res) => {
   }
 });
 
+
+app.post('/generate-batch-text', async (req, res) => {
+  const { topic, language, frames } = req.body;
+  const tone = toneJson.voice || "Friendly and helpful";
+
+  let prompt = `You are a helpful creative assistant. Based on the topic "${topic}", language "${language}", and tone "${tone}", generate text blocks for the following frames. Respect character limits. Respond only with clean structured output.` + "\n\n";
+
+  frames.forEach((frame, index) => {
+    prompt += `Frame ${index + 1}: ${frame.name}\n`;
+    prompt += `Headline (max ${frame.limits.headline || 30} chars)\n`;
+    if (frame.limits.subheadline) {
+      prompt += `Subheadline (max ${frame.limits.subheadline} chars)\n`;
+    }
+    if (frame.limits.button) {
+      prompt += `Button (max ${frame.limits.button} chars)\n`;
+    }
+    prompt += "\n";
+  });
+
+  const output = await callOpenAI(prompt);
+  res.send({ result: output });
+});
+
+
 app.listen(PORT, () => console.log("Backend running on port " + PORT));
