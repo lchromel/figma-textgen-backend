@@ -24,7 +24,13 @@ const PORT = process.env.PORT || 3000;
 const OPENAI_KEY = process.env.OPENAI_KEY;
 
 const limitsJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'limits.json'), 'utf8'));
-const toneJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'tone.json'), 'utf8'));
+const toneMarkdown = fs.readFileSync(path.join(__dirname, 'tone.md'), 'utf8');
+
+// Extract tone from markdown
+const toneMatch = toneMarkdown.match(/## Tone of Voice\n(.*?)(?:\n\n|$)/s);
+const tone = {
+  voice: toneMatch ? toneMatch[1].trim() : "Confident, friendly, clear. Use short sentences. Avoid jargon."
+};
 
 const callOpenAI = async (prompt) => {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -49,11 +55,12 @@ app.get("/limits", (req, res) => {
 });
 
 app.get("/tone", (req, res) => {
-  res.json(toneJson);
+  res.json(tone);
 });
 
 app.post('/generate-text', async (req, res) => {
   const { prompt, topic, language } = req.body;
+  const country = req.body.country;
 
   try {
     const result = await callOpenAI(prompt);
