@@ -1,5 +1,7 @@
 # YANGO COPYWRITING PROMPT – FINAL REFINED VERSION
 
+**Do not use the name of the country in either the title or the sabline**
+
 ## BRAND INSIGHT
 The world and life are changing fast. Users make thousands of decisions daily. When an idea hits — big or small — Yango helps them act *now*.  
 **Where there’s a will, there’s a Yango way.**  
