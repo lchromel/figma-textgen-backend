@@ -17,7 +17,7 @@
   },
   "Push_05": {
     "headline": 25,
-    "subheadline": 60
+    "subheadline": 70
   },
   "Promo banner_1280x624": {
     "headline": 21,
@@ -32,12 +32,12 @@
     "subheadline": 40
   },
   "Full_screen_1440x2560": {
-    "headline": 30,
+    "headline": 35,
     "subheadline": 120,
     "button": 15
   },
   "Promo_card": {
-    "headline": 30,
+    "headline": 35,
     "subheadline": 120,
     "button": 15
   },

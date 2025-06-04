@@ -5,18 +5,140 @@ The world and life are changing fast. Users make thousands of decisions daily. W
 **Where there’s a will, there’s a Yango way.**  
 **Slogan:** *Unstoppable*
 
-## TONE & VOICE RULES
-- Confident, empowering, sharp  
-- Real and grounded in city life: movement, timing, cravings, chaos  
-- Tone = calm urgency → you're not shouting, but you're not slow  
-- Speak like a smart, street-savvy human — not a brand  
-- Motivating and action-oriented without commanding  
-- Add subtle wit or energy — never gimmicky  
-- Show, don’t tell: no flat claims like “it’s easy” or “it’s fast”  
-- Use one sentence per message part — no commas or compound phrases  
-- Metaphors like pace, journey, move are welcome — only if grounded in value  
-- Avoid vague language like “flow”, “vibe”, or “experience” unless tied to clear user benefit  
-- Minimal emoji use: max 1 across a full 3–5 variant set; only if it adds tone  
+## CORE BRAND FOUNDATION
+
+- Insight: Life moves fast. People make thousands of decisions daily. When a spark hits, Yango helps act on it — now.
+- Idea: Yango shortens the time between wanting something and getting it.
+- Role: A smart enabler — always ready, never pushy.
+- Slogan: UNSTOPPABLE
+
+
+## GLOBAL TONE OF VOICE PRINCIPLES
+
+- Be clear in 3 seconds or less — clarity beats cleverness.
+- Empower action — don’t narrate or explain.
+- Urban, modern, scroll-stopping tone.
+- Avoid commands. Offer direction, not pressure.
+- Smart metaphors ok (spark, pace, journey), avoid vague terms (vibe, flow).
+- Brand never takes the spotlight — the user always leads.
+- Confidence > playfulness. Light cleverness is welcome, silliness is not.
+
+
+### Push Notifications
+[keywords: Push_01, Push_02, Push_03, Push_04, Push_05]
+- Max 1 sentence (~8–12 words)
+- No commas or compound sentences
+- Emoji allowed in ~50% of lines, only 1 per push
+- Lead with the benefit or idea
+- Clear CTA is implied or tight (e.g. “Tap and ride”)
+
+### Feed Banners
+[keywords: Feed_480x693, ShortCut_640x416, Promo banner_1280x624]
+- Headline - 1 sentence
+- Body -  1 idea per line, no comma splices
+- CTA - direct action only
+- Emojis allowed sparingly, used with purpose
+
+### Fullscreen Promos
+[keywords: Full_screen_1440x2560, Promo_card]
+- Emotional hooks encouraged: speed, craving, fulfillment
+- No self-centered copy (“Yango brings…” or “This is how we…”)
+
+## TONE BY SERVICE TYPE
+
+TAXI & RIDES
+- Confident, clear, direct
+- Visual: speed, readiness, independence
+- Avoid metaphors of danger or urgency (“green light” is ok, “rush” is not)
+
+NON-TAXI (FOOD, CARGO, SHOPPING)
+- Use “super-app” thinking — Yango enables a lifestyle
+- Emotional lens: craving, momentum, action
+- Frame value: “you want it — we make it happen”
+- Avoid “we deliver…” or “Yango offers…” phrasing
+- Yango stays invisible — experience leads
+
+---
+
+## EMOJI USAGE GUIDELINE
+
+- Used in ~50% of push notifications (alternating is fine)
+- Only 1 emoji per line
+- Use to support meaning (🚗, 📦, 🍔, ⚡, 🛞, 🔐, 🚀, 🎉, 💳)
+- Avoid using emoji for decoration or tone-filler
+
+---
+
+## FORMAT REFERENCE
+
+1. Push Notification  
+2. Feed Banner (in-app, short static + CTA)  
+3. Fullscreen Promo (carousel, promo cards)  
+4. Story/slide sequence (TBD in plugin)  
+5. Fleetroom prompt (optional UI)  
+6. CTA-only line (optional support)
+
+---
+
+## SELECTED EXAMPLES & NOTES
+
+### PUSH — “15% off first 6 rides”  
+[keywords: Push_01, Push_02, Push_03, Push_04, Push_05]
+- “🎉 15% off 6 rides is the sign you’ve been waiting for”  
+  → WORKS: playful tone, immediate value, emoji adds energy  
+- “Six rides, less spend — 15% off and ready when you are”  
+  → WORKS: clear savings message, no filler
+
+### PUSH — “Verified drivers” 
+[keywords: Push_01, Push_02, Push_03, Push_04, Push_05] 
+- “🚦 We check every driver so you can ride without second guessing”  
+  → WORKS: confident, reassuring, safety-focused  
+- “Green light rides start with verified drivers”  
+  → REJECTED: metaphor suggests speeding
+
+### PUSH — “Pay with card”  
+[keywords: Push_01, Push_02, Push_03, Push_04, Push_05]
+- “💳 Card payments are here — get going without the cash run”  
+  → WORKS: function meets tone, emoji reinforces modernity  
+- “Skip the ATM. Your card works now”  
+  → WORKS: no brand voice, just action  
+- “From idea to action — faster”  
+  → REJECTED: too abstract, lacks clear reference to service
+
+---
+
+### FEED BANNER — “Free food delivery”  
+[keywords: Feed_480x693, ShortCut_640x416, Promo banner_1280x624]
+- Headline: “Crave it. Don’t pay for it.”  
+  → WORKS: emotional, value-forward  
+- Body: “Free food delivery is now part of your day. You think it, you tap it, it shows up.”  
+  → WORKS: user-centered flow  
+- Headline: “No fee. No time to lose.”  
+  → REJECTED: too vague, lacks category clarity
+
+---
+
+### FULLSCREEN PROMO — “Free food delivery”  
+[keywords: Full_screen_1440x2560, Promo_card]
+
+- Headline: “🚀 Food. Fast. Free to arrive.”  
+  → WORKS: direct and emotionally motivating  
+- Support: “Whatever you're craving, it comes with no delivery charge.”  
+  → WORKS: food-first, user-first  
+- Headline: “The app that delivers more”  
+  → REJECTED: brand-focused, violates “user leads” principle
+
+---
+
+## DON'Ts
+
+- Don’t start with “We” or “Yango” unless unavoidable
+- Don’t use commas in push or headline lines
+- Don’t let the brand explain itself — the value should be self-evident
+- Don’t turn services into slogans (avoid “This is how Yango feeds the city”)
+- Don’t use emoji purely for decoration or every line
+
+---
 
 
 ## STRUCTURE GUIDELINES
